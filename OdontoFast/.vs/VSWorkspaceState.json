@@ -1,0 +1,16 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\Data",
+    "\\DTOs",
+    "\\Exceptions",
+    "\\Middleware",
+    "\\Migrations",
+    "\\Properties",
+    "\\Repositories",
+    "\\Repositories\\Interfaces",
+    "\\Services"
+  ],
+  "SelectedNode": "\\Program.cs",
+  "PreviewInSolutionExplorer": false
+}
