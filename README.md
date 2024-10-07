@@ -20,6 +20,10 @@ O projeto, até o momento, inclui o desenvolvimento de uma API RESTful que permi
 - Implementação de autenticação para dentistas.
 - Paginação nos resultados das consultas.
 
+**Desenho da Arquitetura:**
+
+![Cronograma](imgs-readme/arquitetura.png)
+
 ### Escopo a ser desenvolvido
 - Preparação e implementação do consumo da API da Aplicação Mobile nas camadas e ajustes conforme os conceitos de arquitetura limpa.
 
