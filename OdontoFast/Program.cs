@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore; // Importa o namespace para Entity Framework Core
 using OdontoFast.Data; // Importa o contexto do banco de dados
 using OdontoFast.Middleware; // Importa o middleware personalizado
@@ -8,9 +9,8 @@ using OdontoFast.Services; // Importa os serviços
 var builder = WebApplication.CreateBuilder(args);
 
 // Adiciona serviços ao contêiner.
-builder.Services.AddControllers(); // Adiciona suporte para controladores MVC
+builder.Services.AddControllersWithViews(); // Adiciona suporte para controladores MVC
 builder.Services.AddEndpointsApiExplorer(); // Habilita a exploração de endpoints
-builder.Services.AddSwaggerGen(); // Adiciona Swagger para documentação da API
 
 // Configuração da conexão com o banco de dados
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -25,20 +25,21 @@ builder.Services.AddScoped<OdontoFast.Repository.Interfaces.IDentistaRepository,
 // Injeção de serviços
 builder.Services.AddScoped<IDentistaService, DentistaService>();
 
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30); // Tempo de expiração da sessão
+});
+
 var app = builder.Build();
 
-// Configuração do pipeline de requisições HTTP.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger(); // Habilita o Swagger em ambiente de desenvolvimento
-    app.UseSwaggerUI(); // Habilita a interface do Swagger UI
-}
-
-// Middleware para tratamento de exceções
-app.UseMiddleware<ExceptionHandlingMiddleware>();
-
+app.UseSession(); // Ativa o uso da sessão
+app.UseMiddleware<ExceptionHandlingMiddleware>(); // Middleware para tratamento de exceções
+app.UseStaticFiles(); // Adicione esta linha para servir arquivos estáticos de wwwroot
 app.UseHttpsRedirection(); // Redireciona HTTP para HTTPS
 app.UseAuthorization(); // Habilita a autorização
-app.MapControllers(); // Mapear rotas para controladores
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Login}/{action=Index}/{id?}"
+); // Mapear rotas para controladores
 
 app.Run(); // Inicia a aplicação

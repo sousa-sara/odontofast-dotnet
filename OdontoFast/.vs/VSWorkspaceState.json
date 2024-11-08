@@ -1,16 +1,10 @@
 {
   "ExpandedNodes": [
     "",
-    "\\Data",
-    "\\DTOs",
-    "\\Exceptions",
-    "\\Middleware",
-    "\\Migrations",
-    "\\Properties",
-    "\\Repositories",
-    "\\Repositories\\Interfaces",
-    "\\Services"
+    "\\Views",
+    "\\Views\\Dentista",
+    "\\Views\\Login"
   ],
-  "SelectedNode": "\\Program.cs",
+  "SelectedNode": "\\Views\\Login\\Index.cshtml",
   "PreviewInSolutionExplorer": false
 }

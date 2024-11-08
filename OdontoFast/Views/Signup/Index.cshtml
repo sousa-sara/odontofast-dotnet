@@ -1,0 +1,62 @@
+@model OdontoFast.DTOs.CreateDentistaDto
+
+@{
+    ViewData["Title"] = "Cadastro";
+}
+
+<!-- Main Container -->
+<div class="login">
+    <div class="login__content">
+        <div class="login__img">
+            <img src="~/img/img-login.svg" alt="Login Image">
+        </div>
+
+        <div class="login__forms">
+            <form method="post" asp-controller="Dentista" asp-action="Create" class="login__registre" id="login-in">
+                <h1 class="login__title fw-bold">Cadastro de Dentista</h1>
+
+                @if (TempData["ErrorMessage"] != null)
+                {
+                <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+                }
+
+
+                <div class="login__box">
+                    <i class='bx bx-user login__icon'></i>
+                    <input type="text" asp-for="NomeDentista" class="login__input" placeholder="Nome" required />
+                    <span asp-validation-for="NomeDentista" class="text-danger"></span>
+                </div>
+
+                <div class="login__box">
+                    <i class='bx bx-lock-alt login__icon'></i>
+                    <input type="password" asp-for="SenhaDentista" class="login__input" placeholder="Senha" required />
+                    <span asp-validation-for="SenhaDentista" class="text-danger"></span>
+                </div>
+
+                <div class="login__box">
+                    <i class='bx bx-badge-check login__icon'></i>
+                    <input type="text" asp-for="Especialidade" class="login__input" placeholder="Especialidade" required />
+                    <span asp-validation-for="Especialidade" class="text-danger"></span>
+                </div>
+
+                <div class="login__box">
+                    <i class='bx bxs-user-badge login__icon'></i>
+                    <input type="text" asp-for="Cro" class="login__input" placeholder="CRO" required />
+                    <span asp-validation-for="Cro" class="text-danger"></span>
+                </div>
+
+                <button type="submit" class="login__button btn ">Cadastrar</button>
+
+                <div>
+                    <span class="login__account">Ja tem uma conta?</span>
+                    <a asp-controller="Login" asp-action="Index" class="login__signin">Entre</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/login-signup.js"></script> <!-- Adicione esta linha para o JavaScript -->
+}

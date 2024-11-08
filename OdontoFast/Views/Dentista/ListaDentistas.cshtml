@@ -1,0 +1,73 @@
+@model IEnumerable<OdontoFast.DTOs.DentistaDto>
+
+    @{
+ViewData["Title"] = "Lista de Dentistas";
+    }
+
+    <h2>Lista de Dentistas</h2>
+
+    <div class="p-3" style="max-height: 65vh; overflow: auto;">
+        <table 
+              class="table table-hover text-center align-middle w-100 h-100" 
+               style="border-collapse: separate; border-spacing: 0 15px;">
+            <thead class="table-gradient" style="background: linear-gradient(45deg, #00acff, #341762); color: white; border-radius: 8px;">
+                <tr>
+                    <th style="border-top-left-radius: 1.5rem;">ID</th>
+                    <th>Nome</th>
+                    <th>CRO</th>
+                    <th style="border-top-right-radius: 1.5rem;">Especialidade</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var dentista in Model)
+                {
+                <tr class="table-row">
+                    <td>@dentista.IdDentista</td>
+                    <td>@dentista.NomeDentista</td>
+                    <td>@dentista.Cro</td>
+                    <td>@dentista.Especialidade</td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <style>
+
+        /* Efeito de gradiente e bordas arredondadas */
+        .table-gradient th {
+            padding: 12px;
+            font-weight: bold;
+            color: white;
+            text-transform: uppercase;
+            border: none;
+        }
+
+        /* Efeito de hover para as linhas */
+        .table-hover tbody tr.table-row:hover {
+            background: rgba(13, 110, 253, 0.1);
+            transform: scale(1.02);
+            transition: all 0.3s ease-in-out;
+            cursor: pointer;
+        }
+
+        /* Bordas arredondadas e espaçamento entre as linhas */
+        .table tbody tr {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Personalização das células */
+        .table tbody td {
+            padding: 15px;
+            border-top: none;
+            border-bottom: none;
+            color: #333;
+        }
+
+        /* Adiciona sombra e animação suave ao passar o mouse */
+        .table tbody tr {
+            transition: all 0.3s ease-in-out;
+        }
+    </style>

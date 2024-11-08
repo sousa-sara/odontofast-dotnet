@@ -1,112 +1,155 @@
-﻿using Microsoft.AspNetCore.Mvc; // Importa o namespace para trabalhar com ASP.NET Core MVC
-using OdontoFast.DTOs; // Importa os DTOs utilizados na aplicação
-using OdontoFast.Exceptions; // Importa as exceções personalizadas
+﻿using Microsoft.AspNetCore.Mvc;
+using OdontoFast.DTOs;
+using OdontoFast.Exceptions;
 
-// Define a rota base para o controlador de dentistas
-[Route("api/[controller]")]
-[ApiController] // Indica que esta classe é um controlador API
-public class DentistaController : ControllerBase
+public class DentistaController : Controller
 {
-    // Serviço para gerenciar as operações relacionadas aos dentistas
     private readonly IDentistaService _dentistaService;
 
-    // Construtor que recebe a instância do serviço de dentistas
     public DentistaController(IDentistaService dentistaService)
     {
-        _dentistaService = dentistaService; // Inicializa o serviço
+        _dentistaService = dentistaService;
     }
 
-    // Método para obter todos os dentistas, com suporte à paginação
+    // Método para listar todos os dentistas (GETALL)
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<DentistaDto>>> GetAll([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+    public async Task<IActionResult> ListaDentistas([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
     {
-        // Chama o serviço para obter a lista de dentistas com a paginação especificada
         var dentistas = await _dentistaService.GetAllDentistasAsync(pageNumber, pageSize);
-        return Ok(dentistas); // Retorna a lista de dentistas com status 200 OK
+
+        int? dentistaId = HttpContext.Session.GetInt32("DentistaId");
+        if (dentistaId.HasValue)
+        {
+            return View(dentistas); // Retorna a View com a listagem
+        }
+        else
+        {
+            return RedirectToAction("Index", "Login");
+        }
     }
 
-    // Método para obter um dentista específico pelo ID
-    [HttpGet("{id}")]
-    public async Task<ActionResult<DentistaDto>> GetById(int id)
+
+    // Método para mostrar o perfil do dentista
+    [HttpGet]
+    public async Task<IActionResult> Index()
+    {
+        int? dentistaId = HttpContext.Session.GetInt32("DentistaId");
+
+        if (dentistaId.HasValue)
+        {
+            var dentista = await _dentistaService.GetDentistaByIdAsync(dentistaId.Value);
+            return View(dentista);
+        }
+        else
+        {
+            return RedirectToAction("Index", "Login");
+        }
+    }
+
+
+    // Método para mostrar o perfil do dentista
+    [HttpGet]
+    public async Task<IActionResult> Perfil()
+    {
+        int? dentistaId = HttpContext.Session.GetInt32("DentistaId");
+
+        if (dentistaId.HasValue)
+        {
+            var dentista = await _dentistaService.GetDentistaByIdAsync(dentistaId.Value);
+            return View(dentista);
+        }
+        else
+        {
+            return RedirectToAction("Index", "Login");
+        }
+    }
+
+
+    // Método para fazer login de um dentista (POST)
+    [HttpPost]
+    public async Task<IActionResult> Login(DentistaLoginDto loginDto)
     {
         try
         {
-            // Chama o serviço para obter um dentista pelo ID
-            var dentista = await _dentistaService.GetDentistaByIdAsync(id);
-            return Ok(dentista); // Retorna o dentista encontrado com status 200 OK
+            var dentista = await _dentistaService.LoginAsync(loginDto);
+            HttpContext.Session.SetInt32("DentistaId", dentista.IdDentista); // Armazena o ID do dentista na sessão
+            return RedirectToAction("Index", "Dentista"); // Redireciona para a página principal ou outra ação
         }
-        catch (NotFoundException ex)
+        catch (BusinessException ex)
         {
-            return NotFound(ex.Message); // Retorna 404 Not Found se o dentista não for encontrado
+            // Define a mensagem de erro
+            TempData["ErrorMessage"] = ex.Message;
+            return RedirectToAction("Index", "Login"); // Retorna para a página de login em caso de erro
         }
     }
 
+
     // Método para criar um novo dentista
-    [HttpPost]
-    public async Task<ActionResult<DentistaDto>> Create([FromBody] CreateDentistaDto dto)
+    [HttpPost("create-dentista")]
+    public async Task<IActionResult> Create(CreateDentistaDto dto)
     {
         try
         {
             // Chama o serviço para criar um dentista com os dados do DTO
             var createdDentista = await _dentistaService.CreateDentistaAsync(dto);
-            // Retorna 201 Created com a localização do novo recurso
-            return CreatedAtAction(nameof(GetById), new { id = createdDentista.IdDentista }, createdDentista);
+
+            TempData["msgRegistro"] = "Acesse o portal de administração utilizando seu CRO e Senha.";
+            return RedirectToAction("Index", "Dentista"); // Redireciona para a página principal ou outra ação
         }
         catch (BusinessException ex)
         {
-            return BadRequest(ex.Message); // Retorna 400 Bad Request se houver uma exceção de negócio
+            // Define a mensagem de erro
+            TempData["ErrorMessage"] = ex.Message;
+            return RedirectToAction("Index", "Signup"); // Retorna para a página de login em caso de erro
         }
     }
 
-    // Método para fazer login de um dentista
-    [HttpPost("login")]
-    public async Task<ActionResult<DentistaDto>> Login([FromBody] DentistaLoginDto loginDto)
+    // Método para atualizar as informações do dentista
+    [HttpPost]
+    public async Task<IActionResult> Update(UpdateDentistaDto dto)
     {
+        int dentistaId = (int)HttpContext.Session.GetInt32("DentistaId");
         try
         {
-            // Chama o serviço para autenticar o dentista
-            var dentista = await _dentistaService.LoginAsync(loginDto);
-            return Ok(dentista); // Retorna o dentista autenticado com status 200 OK
-        }
-        catch (BusinessException ex)
-        {
-            return BadRequest(ex.Message); // Retorna 400 Bad Request se houver uma exceção de negócio
-        }
-    }
-
-    // Método para atualizar as informações de um dentista
-    [HttpPut("{id}")]
-    public async Task<ActionResult<DentistaDto>> Update(int id, [FromBody] UpdateDentistaDto dto)
-    {
-        try
-        {
-            // Chama o serviço para atualizar o dentista com os dados do DTO
-            var updatedDentista = await _dentistaService.UpdateDentistaAsync(id, dto);
-            return Ok(updatedDentista); // Retorna o dentista atualizado com status 200 OK
+            TempData["okMsg"] = "Seus dados foram atualizados!";
+            var updatedDentista = await _dentistaService.UpdateDentistaAsync(dentistaId, dto);
+            return RedirectToAction("Perfil"); // Redireciona para o perfil atualizado
         }
         catch (NotFoundException ex)
         {
-            return NotFound(ex.Message); // Retorna 404 Not Found se o dentista não for encontrado
+            ModelState.AddModelError(string.Empty, ex.Message);
+            return View("DentistaPerfil", dto); // Retorna à View com a mensagem de erro
         }
         catch (BusinessException ex)
         {
-            return BadRequest(ex.Message); // Retorna 400 Bad Request se houver uma exceção de negócio
+            ModelState.AddModelError(string.Empty, ex.Message);
+            return View("DentistaPerfil", dto); // Retorna à View com a mensagem de erro
         }
     }
 
-    // Método para excluir um dentista
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
+    // Método para excluir a conta do dentista
+    [HttpPost]
+    public async Task<IActionResult> Delete()
     {
+        int dentistaId = (int)HttpContext.Session.GetInt32("DentistaId");
         try
         {
-            // Chama o serviço para excluir o dentista pelo ID
-            await _dentistaService.DeleteDentistaAsync(id);
-            return NoContent(); // Retorna 204 No Content para indicar que a exclusão foi bem-sucedida
+            await _dentistaService.DeleteDentistaAsync(dentistaId);
+            HttpContext.Session.Clear(); // Limpa a sessão
+            return RedirectToAction("Index", "Login"); // Redireciona para a página inicial
         }
         catch (NotFoundException ex)
         {
-            return NotFound(ex.Message); // Retorna 404 Not Found se o dentista não for encontrado
+            ModelState.AddModelError(string.Empty, ex.Message);
+            return RedirectToAction("Index", "Perfil");
         }
     }
+
+
+    public IActionResult Logout()
+    {
+        HttpContext.Session.Clear(); 
+        return RedirectToAction("Index", "Login"); 
+    }
+
 }

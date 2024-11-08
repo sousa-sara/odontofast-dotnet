@@ -19,21 +19,49 @@ namespace OdontoFast.Services
             _mapper = mapper;
         }
 
-        // Método para criar um novo dentista
         public async Task<DentistaDto> CreateDentistaAsync(CreateDentistaDto dto)
         {
+            // Validações dos campos obrigatórios
+            if (string.IsNullOrWhiteSpace(dto.NomeDentista))
+                throw new BusinessException("O nome do dentista é obrigatório.");
+
+            if (string.IsNullOrWhiteSpace(dto.SenhaDentista))
+                throw new BusinessException("A senha é obrigatória.");
+
+            if (string.IsNullOrWhiteSpace(dto.Especialidade))
+                throw new BusinessException("A especialidade é obrigatória.");
+
+            if (string.IsNullOrWhiteSpace(dto.Cro))
+                throw new BusinessException("O CRO é obrigatório.");
+
+            // Validação de comprimento
+            if (dto.NomeDentista.Length > 50)
+                throw new BusinessException("O nome do dentista não pode exceder 50 caracteres.");
+
+            if (dto.Especialidade.Length > 50)
+                throw new BusinessException("A especialidade não pode exceder 50 caracteres.");
+
+            if (dto.Cro.Length > 8)
+                throw new BusinessException("O CRO não pode exceder 8 caracteres.");
+
             // Verifica se já existe um dentista com o mesmo CRO
             if (await _dentistaRepository.GetByCroAsync(dto.Cro) != null)
-                throw new BusinessException("Dentista já cadastrado com esse CRO.");
+                throw new BusinessException("Já existe um dentista cadastrado com esse CRO.");
+
+            // Verificação da complexidade da senha
+            if (dto.SenhaDentista.Length < 8 || !dto.SenhaDentista.Any(char.IsDigit) || !dto.SenhaDentista.Any(char.IsLetter))
+                throw new BusinessException("A senha deve ter pelo menos 8 caracteres, incluindo letras e números.");
 
             // Mapeia o DTO para a entidade Dentista
             var dentista = _mapper.Map<Dentista>(dto);
+
             // Adiciona o dentista ao repositório
             await _dentistaRepository.AddAsync(dentista);
 
             // Retorna o DTO do dentista criado
             return _mapper.Map<DentistaDto>(dentista);
         }
+
 
         // Método para obter um dentista pelo ID
         public async Task<DentistaDto> GetDentistaByIdAsync(int id)
@@ -57,6 +85,8 @@ namespace OdontoFast.Services
             }
 
             // Retorna o DTO do dentista para uso no frontend
+            //return _mapper.Map<DentistaDto>(dentista);
+            // CÓDIGO ORIGINAL
             return new DentistaDto
             {
                 IdDentista = dentista.IdDentista,
@@ -69,8 +99,10 @@ namespace OdontoFast.Services
         // Método para obter todos os dentistas com paginação
         public async Task<IEnumerable<DentistaDto>> GetAllDentistasAsync(int pageNumber, int pageSize)
         {
+            // Aguarda a resolução da Task para obter a lista de dentistas
             var dentistas = await _dentistaRepository.GetAllAsync();
-            // Implementa a paginação
+
+            // Aplica a paginação
             return dentistas.Skip((pageNumber - 1) * pageSize).Take(pageSize)
                             .Select(d => _mapper.Map<DentistaDto>(d));
         }
