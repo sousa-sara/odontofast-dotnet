@@ -27,24 +27,45 @@ O projeto, até o momento, inclui o desenvolvimento de uma API RESTful que permi
 ### Escopo a ser desenvolvido
 - Preparação e implementação do consumo da API da Aplicação Mobile nas camadas e ajustes conforme os conceitos de arquitetura limpa.
 
-### Requisitos Funcionais
+### Requisitos Funcionais - Sprint 1
 1. **Cadastro de Dentistas:** O sistema permite que novos dentistas sejam cadastrados com informações como nome, senha, especialidade e CRO.
 2. **Consulta de Dentistas:** O sistema oferece a funcionalidade de consultar os dentistas cadastrados.
 3. **Atualização de Dados:** O sistema permite que os dentistas atualizem suas informações.
 4. **Exclusão de Dentistas:** O sistema permite a remoção de dentistas.
 5. **Autenticação:** O sistema possibilita que dentistas façam login utilizando suas credenciais.
 
-### Requisitos Não Funcionais
+### Requisitos Não Funcionais - Sprint 1
 1. **Escalabilidade:** A arquitetura deve permitir a adição de novas funcionalidades com facilidade.
 2. **Usabilidade:** A API é fácil de usar e bem documentada para desenvolvedores que desejam integrá-la em suas aplicações.
 3. **Documentação:** Código bem documentado, e a API tem uma documentação acessível.
 
-## Tecnologias Utilizadas
+## Tecnologias Utilizadas (Sprint 1)
 - **ASP.NET Core**: Framework para desenvolvimento da API.
 - **Entity Framework Core**: ORM utilizado para interagir com o banco de dados.
 - **Oracle Database**: Banco de dados utilizado para persistência de dados.
 - **AutoMapper**: Biblioteca para mapeamento de objetos.
 - **Swagger**: Ferramenta para documentação da API.
+
+## Tecnologias Utilizadas (Sprint 2)
+- Bootstrap v5.1.0
+
+## Atualizações Realizadas - Sprint 2
+
+### Camada de Visualização:
+- Implementação de rotas padrão para as páginas da aplicação, havendo em cada rota um direcionamento para uma View.
+- Rota personalizada para a ação de criação de um dentista, devido o "[HttpPost("create-dentista")]" permitir acesso via endpoint.
+- Desenvolvimento do layout principal com cabeçalho, rodapé e navegação utilizando Bootstrap e efeitos com javascript.
+- Views com as principais funcionalidades, refatorando validações e aumentando amarrações na regra de negócio para que se adequem às ViewModels.
+- Elaboração de ViewModels para transferir dados entre a camada de apresentação e a lógica de negócios: Como por exemplo mensagens de erro e sucesso em torno da aplicação.
+
+### Camada de Controladores:
+- Refatoramento de controladores para gerenciar requisições HTTP, retornar views, redirecionar para outras ações e executar operações CRUD, seguindo boas práticas de desenvolvimento e validações.
+- Controle de sessão de usuário a partir do login: além de aumentar a segurança das telas permitindo o acesso apenas aos usuário "logado", é reaproveitado o id de sessão gerado a fim de recuperar suas informações, como ocorre na tela de perfil. Além disso, um tempo limite de 30 minutos é estabelecido para controle de inatividade.
+
+
+
+
+
 
 ## Como Executar o Projeto
 1. Clone o repositório.
