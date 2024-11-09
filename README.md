@@ -6,7 +6,6 @@
    - **Sara Sousa/RM:552656**
    - **Leonardo Oliveira/RM:554024**
 
-
 ## Definição do Projeto
 
 ### Objetivo do Projeto
